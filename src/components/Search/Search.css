@@ -1,0 +1,16 @@
+
+.ant-input{
+    font-size: 16px;
+    line-height: 22px;
+    align-items: center;
+    margin-bottom:32px;
+    height:40px;
+    border-radius:4px;
+}
+
+
+@media (max-width: 420px ) {
+	.ant-input{
+        margin-bottom:10px;
+	}
+}

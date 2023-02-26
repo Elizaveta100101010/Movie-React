@@ -1,0 +1,14 @@
+
+.ant-tabs{
+    font-size: 14px;
+    line-height: 22px;
+    margin-top:-10px;
+    font-family: 'Inter';
+	  font-style: normal;
+  	font-weight: 400;
+    align-items: center;
+}
+
+.ant-tabs-nav {
+	width:max-content;
+  }

@@ -1,0 +1,12 @@
+
+#components-pagination-demo-mini .ant-pagination:not(:last-child) {
+    margin-bottom: 24px;
+  }
+
+  .pagination-list{
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+    font-size: 12px;
+    line-height: 22px;
+  }
