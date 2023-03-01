@@ -13,7 +13,6 @@ body {
 	.movie-app {
 		max-width: 1010px;
 		margin: 0 auto;
-		min-width: 420px;
 		height: auto;
 		position: relative;
 		padding: 20px 36px;

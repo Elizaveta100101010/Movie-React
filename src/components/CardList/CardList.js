@@ -1,12 +1,12 @@
 import React from 'react'
 
 import './CardList.css'
-import MCard from '../MCard'
+import MovieCard from '../MovieCard'
 
-const CardList = ({ movieData, apiBase, apiKey }) => {
+const CardList = ({ movieData }) => {
   const elements = movieData.map((item) => {
     const { id, ...itemProps } = item
-    return <MCard {...item} key={id} apiBase={apiBase} apiKey={apiKey} />
+    return <MovieCard {...item} key={id} />
   })
   return <div className="card-list">{elements}</div>
 }

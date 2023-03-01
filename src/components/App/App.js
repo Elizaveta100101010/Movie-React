@@ -9,7 +9,7 @@ import CardList from '../CardList'
 import Header from '../Header'
 import Search from '../Search'
 import Pages from '../Pages'
-import { GenresProvider } from '../GContext'
+import { GenresProvider } from '../GenreContext'
 import MovieService from '../../services/MovieService'
 
 export default class App extends Component {
@@ -25,15 +25,23 @@ export default class App extends Component {
     totalPages: 0,
     totalResults: 0,
     genres: [],
-    tab: 'search',
     landing: 'popular',
     request: '',
+    tab: 1,
+    currentPage: 1,
   }
 
   componentDidMount() {
-    this.createMovieList(`${this._apiBase}/movie/popular?api_key=${this._apiKey}`)
-    this.takeGenres(`${this._apiBase}/genre/movie/list?api_key=${this._apiKey}`)
-    this.takeGuestSession(`${this._apiBase}/authentication/guest_session/new?api_key=${this._apiKey}`)
+    this.createPopularMovies()
+    this.takeGenres()
+    this.takeGuestSession()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.currentPage !== prevState.currentPage) {
+      if (this.state.landing === 'search') this.createSearchMovies(this.state.request)
+      else this.createPopularMovies()
+    }
   }
 
   onError = (err) => {
@@ -50,8 +58,8 @@ export default class App extends Component {
     })
   }
 
-  takeGenres = (url) => {
-    this.MovieService.getItems(url)
+  takeGenres = () => {
+    this.MovieService.getGenresList()
       .then((genres) => {
         this.setState({
           genres: genres.genres,
@@ -60,9 +68,9 @@ export default class App extends Component {
       .catch(this.onError)
   }
 
-  takeGuestSession = (url) => {
+  takeGuestSession = () => {
     if (!localStorage.getItem('guestID')) {
-      this.MovieService.getGuestSession(url)
+      this.MovieService.getGuestSession()
         .then((res) => {
           localStorage.setItem('guestID', res)
         })
@@ -70,33 +78,61 @@ export default class App extends Component {
     }
   }
 
-  createMovieList = debounce((url) => {
+  changePage = (page) => {
+    this.setState({
+      currentPage: page,
+    })
+  }
+
+  createSearchMovies = debounce((title) => {
     this.setState({ movieData: [], loading: true })
-    this.MovieService.getItems(url)
+    this.MovieService.getSearchMovies(title, this.state.currentPage)
       .then((list) => {
-        this.setState({
-          movieData: [...list.results],
-          totalPages: list.total_pages,
-          totalResults: list.total_results,
-          loading: false,
-        })
+        this.setData(list)
       })
       .catch(this.onError)
   }, 1500)
 
+  createPopularMovies = () => {
+    this.setState({ movieData: [], loading: true })
+    this.MovieService.getPopularMovies(this.state.currentPage)
+      .then((list) => {
+        this.setData(list)
+      })
+      .catch(this.onError)
+  }
+
+  createRatedMovies = (guestID) => {
+    this.setState({ movieData: [], loading: true })
+    this.MovieService.getRatedMovies(guestID)
+      .then((list) => {
+        this.setData(list)
+      })
+      .catch(this.onError)
+  }
+
+  setData = (list) => {
+    this.setState({
+      movieData: [...list.results],
+      totalPages: list.total_pages,
+      totalResults: list.total_results,
+      loading: false,
+    })
+  }
   onChangeTab = (index) => {
+    console.log(index)
     if (index === '2') {
       const guestID = localStorage.getItem('guestID')
-      this.setState({ tab: 'rated' })
-      this.createMovieList(`${this._apiBase}/guest_session/${guestID}/rated/movies?api_key=${this._apiKey}`)
+      this.setState({ tab: index })
+      this.createRatedMovies(guestID)
     } else {
-      this.createMovieList(`${this._apiBase}/movie/popular?api_key=${this._apiKey}`)
-      this.setState({ tab: 'search' })
+      this.createPopularMovies()
+      this.setState({ tab: index })
     }
   }
 
   render() {
-    const { movieData, loading, error, totalPages, totalResults, genres, tab, landing, request } = this.state
+    const { movieData, loading, error, totalPages, totalResults, genres, tab } = this.state
     const hasData = !(loading || error)
     const numberPages = totalPages > 5 ? 50 : totalPages * 10
     const errorMessage =
@@ -107,27 +143,10 @@ export default class App extends Component {
         />
       ) : null
     const spinner = loading ? <Spin className="spinner" size="large" /> : null
-    const content = hasData ? <CardList movieData={movieData} apiBase={this._apiBase} apiKey={this._apiKey} /> : null
+    const content = hasData ? <CardList movieData={movieData} /> : null
     const searcher =
-      tab === 'search' ? (
-        <Search
-          onCreateMovieList={this.createMovieList}
-          apiBase={this._apiBase}
-          apiKey={this._apiKey}
-          changeLanding={this.changeLanding}
-        />
-      ) : null
-    const pager =
-      totalPages > 1 ? (
-        <Pages
-          pages={numberPages}
-          onCreateMovieList={this.createMovieList}
-          landing={landing}
-          request={request}
-          apiBase={this._apiBase}
-          apiKey={this._apiKey}
-        />
-      ) : null
+      tab == 1 ? <Search onCreateSearchMovies={this.createSearchMovies} changeLanding={this.changeLanding} /> : null
+    const pager = totalPages > 1 ? <Pages pages={numberPages} onChangePage={this.changePage} /> : null
 
     return (
       <div className="movie-app">

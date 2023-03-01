@@ -10,17 +10,13 @@ export default class Search extends Component {
     this.setState({
       title: e.target.value,
     })
-    this.props.onCreateMovieList(
-      `${this.props.apiBase}/search/movie?api_key=${this.props.apiKey}&query=${e.target.value}`
-    )
+    this.props.onCreateSearchMovies(e.target.value)
     this.props.changeLanding(e.target.value)
   }
 
   onSubmitNew = (e) => {
     e.preventDefault()
-    this.props.onCreateMovieList(
-      `${this.props.apiBase}/search/movie?api_key=${this.props.apiKey}&query=${this.state.title}`
-    )
+    this.props.onCreateSearchMovies(this.state.title)
     this.props.changeLanding(this.state.title)
   }
 
