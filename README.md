@@ -2,4 +2,4 @@
 Знаю, что можно было сделать через children Tabs, но так как там меняется только наличие search по факту, решила, что так будет сделать удобнее просто.
 
 Movie DB
-https://movies-psi-ten.vercel.app/
+https://movies-1x2afcghy-elizaveta100101010.vercel.app/
