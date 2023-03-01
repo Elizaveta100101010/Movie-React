@@ -13,8 +13,7 @@ import { GenresProvider } from '../GenreContext'
 import MovieService from '../../services/MovieService'
 
 export default class App extends Component {
-  _apiBase = 'https://api.themoviedb.org/3'
-  _apiKey = '1cfd329cc2777c76f08432aa58835e40'
+
 
   MovieService = new MovieService()
 
